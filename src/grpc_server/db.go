@@ -11,7 +11,7 @@ type userInfo struct {
 	username string
 	password string
 	nickname string
-	profile  []byte
+	profile  string
 }
 
 var db *sql.DB
@@ -34,7 +34,7 @@ func queryInfo(username string) (*userInfo, error) {
 	return &ui, err
 }
 
-func uploadProfile(username *string, profile *[]byte) error {
+func uploadProfile(username *string, profile *string) error {
 	stmt, err := db.Prepare("update user_info_tab_00000000 set profile= ?  where username = ?")
 	if err != nil {
 		return err

@@ -14,5 +14,5 @@ message LoginRequest {
 message LoginReply {
     string username = 1;
     string nickname = 2;
-    bytes profile = 3;
+    string profile = 3;
 }

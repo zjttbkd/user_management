@@ -9,7 +9,7 @@ import (
 	pb "shopee/entrytask-kuangdi.bao/src/pb"
 )
 
-// TODO v1 use only one conn
+// TODO connection pool
 var conn *grpc.ClientConn
 var client pb.UsrmgnClient
 
@@ -21,6 +21,11 @@ func init() {
 	client = pb.NewUsrmgnClient(conn)
 }
 
+func index(c *gin.Context) {
+	c.HTML(http.StatusOK, "index.html", nil)
+}
+
+// TODO token
 func login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
@@ -34,8 +39,8 @@ func login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":   "SUCCESS",
+	c.HTML(http.StatusOK, "usrinfo.html", gin.H{
+		"username": username,
 		"nickname": res.Nickname,
 		"profile":  res.Profile,
 	})
@@ -46,10 +51,11 @@ func main() {
 
 	r := gin.Default()
 	r.LoadHTMLGlob("../html/*")
-	r.GET("/*index", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
-	})
-	r.POST("/form_post", login)
+	r.Static("../img", "./img")
+
+	r.GET("/", index)
+	r.GET("/index", index)
+	r.POST("/login", login)
 
 	// Run http http_server
 	if err := r.Run(":8052"); err != nil {

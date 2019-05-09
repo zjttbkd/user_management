@@ -7,7 +7,7 @@
 
 ### pb接口
 
-#### Login Service
+#### Login
 
 request
 
@@ -22,11 +22,11 @@ reply
 ------|-----|----
 username|string|账号
 nickname|string|昵称
-profile|bytes|头像
+profile|bytes|图片地址
 
-#### Profile Service
+#### UploadProfile
 
-#### Nickname Service
+#### ChangeNickname
 
 ## 数据库设计
 
@@ -40,6 +40,6 @@ uid|bigint unsigned|内部id（自增主键）
 username|varhcar(128)|账号（索引）
 password|varchar(128)|密码
 nickname|varchar(255)|昵称
-profile|blob|头像
+profile|varchar(255)|图片地址
 create_time|int unsigned|创建时间
 modify_time|int unsigned|修改时间（索引）
