@@ -11,9 +11,11 @@ import (
 	pb "shopee/entrytask-kuangdi.bao/src/pb"
 )
 
-type usrmgnServer struct{}
+type server struct{}
 
-func (s *usrmgnServer) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginReply, error) {
+func (s *server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginReply, error) {
+	log.Printf("in username: %v", in.Username)
+
 	ui, err := queryInfo(in.Username)
 	if err != nil {
 		return &pb.LoginReply{}, errors.New("user not existed")
@@ -32,7 +34,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterUsrmgnServer(s, &usrmgnServer{})
+	pb.RegisterUsrmgnServer(s, &server{})
 
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
