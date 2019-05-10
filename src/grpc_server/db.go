@@ -35,7 +35,7 @@ func queryInfo(username string) (*userInfo, error) {
 }
 
 func uploadProfile(username *string, profile *string) error {
-	stmt, err := db.Prepare("update user_info_tab_00000000 set profile= ?  where username = ?")
+	stmt, err := db.Prepare("update user_info_tab_00000000 set profile= ?, modify_time=UNIX_TIMESTAMP() where username = ?")
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func uploadProfile(username *string, profile *string) error {
 }
 
 func changeNickname(username *string, nickname *string) error {
-	stmt, err := db.Prepare("update user_info_tab_00000000 set nickname= ?  where username = ?")
+	stmt, err := db.Prepare("update user_info_tab_00000000 set nickname= ?, modify_time=UNIX_TIMESTAMP() where username = ?")
 	if err != nil {
 		return err
 	}

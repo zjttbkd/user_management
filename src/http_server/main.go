@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -19,6 +20,16 @@ var conn *grpc.ClientConn
 var client pb.UsrmgnClient
 
 func init() {
+	// create img directory
+	if _, err := os.Stat("./img"); err != nil {
+		err := os.MkdirAll("./img", 0777)
+
+		if err != nil {
+			log.Fatalln("create directory err")
+		}
+	}
+
+	// create grpc client
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
@@ -66,7 +77,7 @@ func login(c *gin.Context) {
 func uploadProfile(c *gin.Context) {
 	cookie, err := c.Cookie("gin_cookie")
 	if err != nil {
-		c.HTML(http.StatusOK, "index.html", nil)
+		c.HTML(http.StatusUnauthorized, "index.html", nil)
 	}
 
 	file, err := c.FormFile("profile")
@@ -102,7 +113,7 @@ func uploadProfile(c *gin.Context) {
 func changeNickname(c *gin.Context) {
 	cookie, err := c.Cookie("gin_cookie")
 	if err != nil {
-		c.HTML(http.StatusOK, "index.html", nil)
+		c.HTML(http.StatusUnauthorized, "index.html", nil)
 	}
 
 	nickname := c.PostForm("nickname")
