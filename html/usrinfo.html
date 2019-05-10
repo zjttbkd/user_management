@@ -5,10 +5,22 @@
     <title>UsrInfo</title>
 </head>
 <body>
+<h1>User Info</h1>
 <ul>
-    <li>{{.username}}</li>
-    <li>{{.nickname}}</li>
-    <img src="{{.profile}}" alt="profile">
+    <li>Username: {{.username}}</li>
+    <li>Nickname: {{.nickname}}</li>
+    <li>Profile: <img src="{{.profile}}" alt="profile"></li>
 </ul>
+<br>
+<h3>Edit Profile</h3>
+<form action="/upload" method="post" enctype="multipart/form-data">
+    New Profile: <input type="file" name="profile"><br>
+    <input type="submit" value="Upload">
+</form>
+<h3>Edit Nickname</h3>
+<form action="/change" method="post">
+    New Name: <input type="text" name="nickname">
+    <input type="submit" value="Change">
+</form>
 </body>
 </html>

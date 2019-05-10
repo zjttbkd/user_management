@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -45,14 +46,14 @@ func login(c *gin.Context) {
 	req := &pb.LoginRequest{Username: username, Password: password, Authorized: authorized}
 	res, err := client.Login(c, req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+		c.HTML(http.StatusInternalServerError, "result.html", gin.H{
+			"result": err.Error(),
 		})
 		return
 	}
 
 	if !authorized {
-		c.SetCookie("gin_cookie", username, 86400, "/", "192.168.33.10", false, false)
+		c.SetCookie("gin_cookie", username, 360, "/", "192.168.33.10", false, false)
 	}
 
 	c.HTML(http.StatusOK, "usrinfo.html", gin.H{
@@ -70,24 +71,32 @@ func uploadProfile(c *gin.Context) {
 
 	file, err := c.FormFile("profile")
 	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("get form err: %s", err.Error()))
+		c.HTML(http.StatusBadRequest, "result.html", gin.H{
+			"result": fmt.Sprintf("get form err: %s", err.Error()),
+		})
 		return
 	}
 
-	profile := "img/" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + filepath.Base(file.Filename)
+	profile := "./img/" + cookie + "_" + strconv.FormatInt(time.Now().Unix(), 10) + path.Ext(filepath.Base(file.Filename))
 	if err := c.SaveUploadedFile(file, profile); err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
+		c.HTML(http.StatusBadRequest, "result.html", gin.H{
+			"result": fmt.Sprintf("upload file err: %s", err.Error()),
+		})
 		return
 	}
 
 	req := &pb.ProfileRequest{Username: cookie, Profile: profile}
 	_, err = client.UploadProfile(c, req)
 	if err != nil {
-		c.String(http.StatusInternalServerError, fmt.Sprintf("upload file err: %s", err.Error()))
+		c.HTML(http.StatusInternalServerError, "result.html", gin.H{
+			"result": fmt.Sprintf("upload file err: %s", err.Error()),
+		})
 		return
 	}
 
-	c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully.", file.Filename))
+	c.HTML(http.StatusOK, "result.html", gin.H{
+		"result": fmt.Sprintf("File %s uploaded successfully.", file.Filename),
+	})
 }
 
 func changeNickname(c *gin.Context) {
@@ -101,11 +110,15 @@ func changeNickname(c *gin.Context) {
 	req := &pb.NicknameRequest{Username: cookie, Nickname: nickname}
 	_, err = client.ChangeNickname(c, req)
 	if err != nil {
-		c.String(http.StatusInternalServerError, fmt.Sprintf("change nickname err: %s", err.Error()))
+		c.HTML(http.StatusInternalServerError, "result.html", gin.H{
+			"result": fmt.Sprintf("change nickname err: %s", err.Error()),
+		})
 		return
 	}
 
-	c.String(http.StatusOK, fmt.Sprintln("Change nickname successfully."))
+	c.HTML(http.StatusOK, "result.html", gin.H{
+		"result": fmt.Sprintln("Change nickname successfully."),
+	})
 }
 
 func main() {
@@ -114,10 +127,11 @@ func main() {
 	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	r.LoadHTMLGlob("../html/*")
-	r.Static("../img", "./img")
+	r.Static("/img", "./img")
 
 	r.GET("/", index)
 	r.GET("/index", index)
+	r.GET("/login", login)
 	r.POST("/login", login)
 	r.POST("/upload", uploadProfile)
 	r.POST("/change", changeNickname)
