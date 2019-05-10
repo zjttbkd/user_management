@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -25,18 +29,30 @@ func index(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", nil)
 }
 
-// TODO token
 func login(c *gin.Context) {
-	username := c.PostForm("username")
-	password := c.PostForm("password")
+	var username, password string
+	var authorized bool
 
-	req := &pb.LoginRequest{Username: username, Password: password}
+	cookie, err := c.Cookie("gin_cookie")
+	if err != nil || cookie == "" {
+		username = c.PostForm("username")
+		password = c.PostForm("password")
+	} else {
+		username = cookie
+		authorized = true
+	}
+
+	req := &pb.LoginRequest{Username: username, Password: password, Authorized: authorized}
 	res, err := client.Login(c, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
+	}
+
+	if !authorized {
+		c.SetCookie("gin_cookie", username, 86400, "/", "192.168.33.10", false, false)
 	}
 
 	c.HTML(http.StatusOK, "usrinfo.html", gin.H{
@@ -46,18 +62,67 @@ func login(c *gin.Context) {
 	})
 }
 
+func uploadProfile(c *gin.Context) {
+	cookie, err := c.Cookie("gin_cookie")
+	if err != nil {
+		c.HTML(http.StatusOK, "index.html", nil)
+	}
+
+	file, err := c.FormFile("profile")
+	if err != nil {
+		c.String(http.StatusBadRequest, fmt.Sprintf("get form err: %s", err.Error()))
+		return
+	}
+
+	profile := "img/" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + filepath.Base(file.Filename)
+	if err := c.SaveUploadedFile(file, profile); err != nil {
+		c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
+		return
+	}
+
+	req := &pb.ProfileRequest{Username: cookie, Profile: profile}
+	_, err = client.UploadProfile(c, req)
+	if err != nil {
+		c.String(http.StatusInternalServerError, fmt.Sprintf("upload file err: %s", err.Error()))
+		return
+	}
+
+	c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully.", file.Filename))
+}
+
+func changeNickname(c *gin.Context) {
+	cookie, err := c.Cookie("gin_cookie")
+	if err != nil {
+		c.HTML(http.StatusOK, "index.html", nil)
+	}
+
+	nickname := c.PostForm("nickname")
+
+	req := &pb.NicknameRequest{Username: cookie, Nickname: nickname}
+	_, err = client.ChangeNickname(c, req)
+	if err != nil {
+		c.String(http.StatusInternalServerError, fmt.Sprintf("change nickname err: %s", err.Error()))
+		return
+	}
+
+	c.String(http.StatusOK, fmt.Sprintln("Change nickname successfully."))
+}
+
 func main() {
 	defer conn.Close()
 
 	r := gin.Default()
+	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	r.LoadHTMLGlob("../html/*")
 	r.Static("../img", "./img")
 
 	r.GET("/", index)
 	r.GET("/index", index)
 	r.POST("/login", login)
+	r.POST("/upload", uploadProfile)
+	r.POST("/change", changeNickname)
 
-	// Run http http_server
+	// Run http_server
 	if err := r.Run(":8052"); err != nil {
 		log.Fatalf("could not run http_server: %v", err)
 	}

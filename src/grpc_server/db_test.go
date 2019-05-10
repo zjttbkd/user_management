@@ -20,18 +20,9 @@ func TestQueryInfo(t *testing.T) {
 	}
 }
 
-func TestUploadProfile_1(t *testing.T) {
+func TestUploadProfile(t *testing.T) {
 	username := "test"
 	profile := "test_" + strconv.Itoa(rand.Int()) + ".img"
-	err := uploadProfile(&username, &profile)
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-func TestUploadProfile_2(t *testing.T) {
-	username := "test"
-	profile := "/img/test.png"
 	err := uploadProfile(&username, &profile)
 	if err != nil {
 		t.Error(err)

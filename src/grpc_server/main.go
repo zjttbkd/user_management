@@ -14,18 +14,32 @@ import (
 type server struct{}
 
 func (s *server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginReply, error) {
-	log.Printf("in username: %v", in.Username)
-
 	ui, err := queryInfo(in.Username)
 	if err != nil {
 		return &pb.LoginReply{}, errors.New("user not existed")
 	}
 
-	if ui.password != in.Password {
+	if !in.Authorized && ui.password != in.Password {
 		return &pb.LoginReply{}, errors.New("wrong password")
 	}
 
 	return &pb.LoginReply{Username: ui.username, Nickname: ui.nickname, Profile: ui.profile}, nil
+}
+
+func (s *server) UploadProfile(ctx context.Context, in *pb.ProfileRequest) (*pb.CommReply, error) {
+	err := uploadProfile(&in.Username, &in.Profile)
+	if err != nil {
+		return &pb.CommReply{Result: "upload profile failed"}, err
+	}
+	return &pb.CommReply{Result: "ok"}, nil
+}
+
+func (s *server) ChangeNickname(ctx context.Context, in *pb.NicknameRequest) (*pb.CommReply, error) {
+	err := changeNickname(&in.Username, &in.Nickname)
+	if err != nil {
+		return &pb.CommReply{Result: "change nickname failed"}, err
+	}
+	return &pb.CommReply{Result: "ok"}, nil
 }
 
 func main() {

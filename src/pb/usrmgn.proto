@@ -4,15 +4,32 @@ package usrmgn;
 
 service Usrmgn {
     rpc Login (LoginRequest) returns (LoginReply){}
+    rpc UploadProfile (ProfileRequest) returns (CommReply) {}
+    rpc ChangeNickname (NicknameRequest) returns (CommReply) {}
 }
 
 message LoginRequest {
     string username = 1;
     string password = 2;
+    bool authorized = 3;
 }
 
 message LoginReply {
     string username = 1;
     string nickname = 2;
     string profile = 3;
+}
+
+message ProfileRequest {
+    string username = 1;
+    string profile = 2;
+}
+
+message NicknameRequest {
+    string username = 1;
+    string nickname = 2;
+}
+
+message CommReply {
+    string result = 1;
 }
