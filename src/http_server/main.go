@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -50,7 +49,7 @@ func index(c *gin.Context) {
 	res, err := client.Query(c, req)
 	if err != nil {
 		log.Println(err.Error())
-		c.Redirect(http.StatusInternalServerError, "login.html")
+		c.Redirect(http.StatusFound, "login")
 		return
 	}
 
@@ -93,7 +92,7 @@ func login(c *gin.Context) {
 func uploadProfile(c *gin.Context) {
 	cookie, err := c.Cookie("gin_cookie")
 	if err != nil {
-		c.HTML(http.StatusFound, "login", nil)
+		c.Redirect(http.StatusFound, "login")
 	}
 
 	file, err := c.FormFile("profile")
@@ -130,7 +129,7 @@ func uploadProfile(c *gin.Context) {
 func changeNickname(c *gin.Context) {
 	cookie, err := c.Cookie("gin_cookie")
 	if err != nil {
-		c.HTML(http.StatusFound, "login", nil)
+		c.Redirect(http.StatusFound, "login")
 	}
 
 	nickname := c.PostForm("nickname")
@@ -152,9 +151,9 @@ func changeNickname(c *gin.Context) {
 func main() {
 	defer conn.Close()
 
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
 	gin.SetMode(gin.ReleaseMode)
-	gin.DefaultWriter = ioutil.Discard
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	r.LoadHTMLGlob("../html/*")
 	r.Static("/img", "./img")
