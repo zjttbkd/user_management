@@ -29,12 +29,28 @@ func init() {
 		}
 	}
 
+	// create log directory
+	if _, err := os.Stat("./log"); err != nil {
+		err := os.MkdirAll("./log", 0777)
+
+		if err != nil {
+			log.Fatalln("create directory err")
+		}
+	}
+
 	// create grpc client
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	client = pb.NewUsrmgnClient(conn)
+
+	// set gin config
+	reqlog, _ := os.Create("./log/gin.log")
+	errlog, _ := os.Create("./log/err.log")
+	gin.DefaultWriter = reqlog
+	gin.DefaultErrorWriter = errlog
+	gin.SetMode(gin.ReleaseMode)
 }
 
 // user info page
@@ -151,9 +167,7 @@ func changeNickname(c *gin.Context) {
 func main() {
 	defer conn.Close()
 
-	r := gin.New()
-	r.Use(gin.Recovery())
-	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	r.LoadHTMLGlob("../html/*")
 	r.Static("/img", "./img")
