@@ -7,13 +7,6 @@ import (
 	"log"
 )
 
-type userInfo struct {
-	username string
-	password string
-	nickname string
-	profile  string
-}
-
 var db *sql.DB
 
 func init() {
@@ -26,21 +19,21 @@ func init() {
 }
 
 func queryInfo(username string) (*userInfo, error) {
-	row := db.QueryRow("select password, nickname, profile from user_info_tab_00000000 where username = ?", username)
+	row := db.QueryRow("select password, Nickname, Profile from user_info_tab_00000000 where username = ?", username)
 
 	ui := userInfo{username: username}
-	err := row.Scan(&ui.password, &ui.nickname, &ui.profile)
+	err := row.Scan(&ui.password, &ui.Nickname, &ui.Profile)
 
 	return &ui, err
 }
 
-func uploadProfile(username *string, profile *string) error {
-	stmt, err := db.Prepare("update user_info_tab_00000000 set profile= ?, modify_time=UNIX_TIMESTAMP() where username = ?")
+func uploadProfile(username string, profile string) error {
+	stmt, err := db.Prepare("update user_info_tab_00000000 set Profile= ?, modify_time=UNIX_TIMESTAMP() where username = ?")
 	if err != nil {
 		return err
 	}
 
-	res, err := stmt.Exec(*profile, *username)
+	res, err := stmt.Exec(profile, username)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -59,13 +52,13 @@ func uploadProfile(username *string, profile *string) error {
 	return nil
 }
 
-func changeNickname(username *string, nickname *string) error {
-	stmt, err := db.Prepare("update user_info_tab_00000000 set nickname= ?, modify_time=UNIX_TIMESTAMP() where username = ?")
+func changeNickname(username string, nickname string) error {
+	stmt, err := db.Prepare("update user_info_tab_00000000 set Nickname= ?, modify_time=UNIX_TIMESTAMP() where username = ?")
 	if err != nil {
 		return err
 	}
 
-	res, err := stmt.Exec(*nickname, *username)
+	res, err := stmt.Exec(nickname, username)
 	if err != nil {
 		log.Println(err)
 		return err

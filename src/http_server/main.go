@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -37,24 +38,40 @@ func init() {
 	client = pb.NewUsrmgnClient(conn)
 }
 
+// user info page
 func index(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", nil)
-}
-
-func login(c *gin.Context) {
-	var username, password string
-	var authorized bool
-
 	cookie, err := c.Cookie("gin_cookie")
-	if err != nil || cookie == "" {
-		username = c.PostForm("username")
-		password = c.PostForm("password")
-	} else {
-		username = cookie
-		authorized = true
+	if err != nil {
+		c.Redirect(http.StatusFound, "login")
+		return
 	}
 
-	req := &pb.LoginRequest{Username: username, Password: password, Authorized: authorized}
+	req := &pb.QueryRequest{Username: cookie}
+	res, err := client.Query(c, req)
+	if err != nil {
+		log.Println(err.Error())
+		c.Redirect(http.StatusInternalServerError, "login.html")
+		return
+	}
+
+	c.HTML(http.StatusOK, "usrinfo.html", gin.H{
+		"username": res.Username,
+		"nickname": res.Nickname,
+		"profile":  res.Profile,
+	})
+}
+
+// sign in page
+func signIn(c *gin.Context) {
+	c.HTML(http.StatusOK, "login.html", nil)
+}
+
+// login action
+func login(c *gin.Context) {
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+
+	req := &pb.LoginRequest{Username: username, Password: password}
 	res, err := client.Login(c, req)
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "result.html", gin.H{
@@ -63,9 +80,7 @@ func login(c *gin.Context) {
 		return
 	}
 
-	if !authorized {
-		c.SetCookie("gin_cookie", username, 360, "/", "192.168.33.10", false, false)
-	}
+	c.SetCookie("gin_cookie", username, 360, "/", "192.168.33.10", false, false)
 
 	c.HTML(http.StatusOK, "usrinfo.html", gin.H{
 		"username": username,
@@ -74,10 +89,11 @@ func login(c *gin.Context) {
 	})
 }
 
+// upload profile action
 func uploadProfile(c *gin.Context) {
 	cookie, err := c.Cookie("gin_cookie")
 	if err != nil {
-		c.HTML(http.StatusUnauthorized, "index.html", nil)
+		c.HTML(http.StatusFound, "login", nil)
 	}
 
 	file, err := c.FormFile("profile")
@@ -110,10 +126,11 @@ func uploadProfile(c *gin.Context) {
 	})
 }
 
+// change nickname action
 func changeNickname(c *gin.Context) {
 	cookie, err := c.Cookie("gin_cookie")
 	if err != nil {
-		c.HTML(http.StatusUnauthorized, "index.html", nil)
+		c.HTML(http.StatusFound, "login", nil)
 	}
 
 	nickname := c.PostForm("nickname")
@@ -136,13 +153,15 @@ func main() {
 	defer conn.Close()
 
 	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = ioutil.Discard
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	r.LoadHTMLGlob("../html/*")
 	r.Static("/img", "./img")
 
 	r.GET("/", index)
 	r.GET("/index", index)
-	r.GET("/login", login)
+	r.GET("/login", signIn)
 	r.POST("/login", login)
 	r.POST("/upload", uploadProfile)
 	r.POST("/change", changeNickname)

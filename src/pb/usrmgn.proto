@@ -3,22 +3,21 @@ syntax = "proto3";
 package usrmgn;
 
 service Usrmgn {
-    rpc Login (LoginRequest) returns (LoginReply){}
-    rpc UploadProfile (ProfileRequest) returns (CommReply) {}
-    rpc ChangeNickname (NicknameRequest) returns (CommReply) {}
+    rpc Login (LoginRequest) returns (UsrInfoReply){}
+    rpc Query(QueryRequest) returns (UsrInfoReply){}
+    rpc UploadProfile (ProfileRequest) returns (UsrInfoReply) {}
+    rpc ChangeNickname (NicknameRequest) returns (UsrInfoReply) {}
 }
 
 message LoginRequest {
     string username = 1;
     string password = 2;
-    bool authorized = 3;
 }
 
-message LoginReply {
+message QueryRequest {
     string username = 1;
-    string nickname = 2;
-    string profile = 3;
 }
+
 
 message ProfileRequest {
     string username = 1;
@@ -30,6 +29,8 @@ message NicknameRequest {
     string nickname = 2;
 }
 
-message CommReply {
-    string result = 1;
+message UsrInfoReply {
+    string username = 1;
+    string nickname = 2;
+    string profile = 3;
 }

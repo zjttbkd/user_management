@@ -16,14 +16,28 @@ func init() {
 func TestServer_Login(t *testing.T) {
 	s := server{}
 
-	in := []pb.LoginRequest{{Username: "test", Password: "123456"}, {Username: "test", Authorized: true}}
+	in := []pb.LoginRequest{{Username: "test", Password: "123456"}, {Username: "test", Password: "654321"}}
 	for _, tt := range in {
 		out, err := s.Login(context.Background(), &tt)
 		if err != nil {
-			t.Error(err)
+			if err.Error() != "wrong password" {
+				t.Error(err)
+			}
 		} else {
 			t.Log(out)
 		}
+	}
+}
+
+func TestServer_Query(t *testing.T) {
+	s := server{}
+
+	in := &pb.QueryRequest{Username: "test"}
+	out, err := s.Query(context.Background(), in)
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log(out)
 	}
 }
 

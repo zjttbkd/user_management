@@ -2,19 +2,49 @@
 
 ## 接口设计
 
-### pb接口
+### grpc服务
 
-#### Login
+#### pb接口
 
-- request:
+接口名|输入包 | 返回包
+------|-----|-------
+登录鉴权|LoginRequest|UsrInfoReply
+查询信息|QueryRequest|UsrInfoReply
+修改图片|ProfileRequest|UsrInfoReply
+修改昵称|NicknameRequest|UsrInfoReply
+
+#### 请求包字段
+
+- LoginRequest:
 
 字段名 | 类型 | 说明
 ------|-----|----
 username|string|账号
 password|string|密码
-authorized|bool|免密
 
-- reply:
+- QueryRequest:
+
+字段名 | 类型 | 说明
+------|-----|----
+username|string|账号
+
+- ProfileRequest:
+
+字段名 | 类型 | 说明
+------|-----|----
+username|string|账号
+profile|string|修改后的图片地址
+
+- NicknameRequest:
+
+字段名 | 类型 | 说明
+------|-----|----
+username|string|账号
+nickname|string|修改后的昵称
+
+#### 返回包字段
+
+- UsrInfoReply:
 
 字段名 | 类型 | 说明
 ------|-----|----
@@ -22,35 +52,6 @@ username|string|账号
 nickname|string|昵称
 profile|profile|图片地址
 
-#### UploadProfile
-
-- request:
-
-字段名 | 类型 | 说明
-------|-----|----
-username|string|账号
-profile|string|修改后的图片地址
-
-- reply:
-
-字段名 | 类型 | 说明
-------|-----|----
-result|string|结果信息
-
-#### ChangeNickname
-
-- request:
-
-字段名 | 类型 | 说明
-------|-----|----
-username|string|账号
-nickname|string|修改后的昵称
-
-- reply:
-
-字段名 | 类型 | 说明
-------|-----|----
-result|string|结果信息
 
 ## 数据库设计
 
