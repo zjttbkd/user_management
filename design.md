@@ -1,5 +1,19 @@
 # entrytask设计文档
 
+## 目录说明
+```
+├── bin # bin目录
+├── config # 配置文件
+├── html # 前台页面
+├── img # 用户图片
+├── log # 日志文件
+└── src # src目录
+    ├── grpc_server # tcp服务器
+    ├── http_server # http服务器
+    ├── pb # pb协议
+    └── vendor # vendor目录
+```
+
 ## 接口设计
 
 ### http服务
