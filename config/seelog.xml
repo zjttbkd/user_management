@@ -1,0 +1,35 @@
+<seelog type="asynctimer" asyncinterval="5000000" minlevel="info" maxlevel="critical">
+
+    <outputs formatid="common">
+        <rollingfile formatid="common" type="date" filename="./log/all.log" datepattern="2006-01-02" fullname="true" maxrolls="30" />
+
+        <filter formatid="debug" levels="debug">
+            <rollingfile formatid="debug" type="date" filename="./log/debug.log" datepattern="2006-01-02" fullname="true" maxrolls="30" />
+        </filter>
+
+        <filter formatid="info" levels="info">
+            <rollingfile formatid="info" type="date" filename="./log/info.log" datepattern="2006-01-02" fullname="true" maxrolls="30" />
+        </filter>
+
+        <filter formatid="warn" levels="warn">
+            <rollingfile formatid="warn" type="date" filename="./log/warn.log" datepattern="2006-01-02" fullname="true" maxrolls="30" />
+        </filter>
+
+        <filter formatid="error" levels="error">
+            <rollingfile formatid="error" type="date" filename="./log/error.log" datepattern="2006-01-02" fullname="true" maxrolls="30" />
+        </filter>
+
+        <filter formatid="error" levels="critical">
+            <rollingfile formatid="error" type="date" filename="./log/critical.log" datepattern="2006-01-02" fullname="true" maxrolls="30" />
+        </filter>
+    </outputs>
+
+    <formats>
+        <format id="common" format="%Date(2006-01-02 15:04:05.000000) [%Level] [%FuncShort] [%File/%Line] %Msg%n" />
+        <format id="debug" format="%Date(2006-01-02 15:04:05.000000) [%Level] [%FuncShort] [%File/%Line] %Msg%n" />
+        <format id="info" format="%Date(2006-01-02 15:04:05.000000) [%Level] [%FuncShort] [%File/%Line] %Msg%n" />
+        <format id="error" format="%Date(2006-01-02 15:04:05.000000) [%Level] [%Func] [%File/%Line] %Msg%n" />
+        <format id="warn" format="%Msg%n" />
+    </formats>
+
+</seelog>

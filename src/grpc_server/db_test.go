@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -22,7 +22,7 @@ func TestQueryInfo(t *testing.T) {
 
 func TestUploadProfile(t *testing.T) {
 	username := "test"
-	profile := "test_" + strconv.Itoa(rand.Int()) + ".img"
+	profile := fmt.Sprintf("test_%v.img", rand.Int())
 	err := uploadProfile(username, profile)
 	if err != nil {
 		t.Error(err)
@@ -31,7 +31,7 @@ func TestUploadProfile(t *testing.T) {
 
 func TestChangeNickname(t *testing.T) {
 	username := "test"
-	nickname := "test_change_" + strconv.Itoa(rand.Int())
+	nickname := fmt.Sprintf("test_change_%v", rand.Int())
 	err := changeNickname(username, nickname)
 	if err != nil {
 		t.Error(err)

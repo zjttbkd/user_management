@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"errors"
+	log "github.com/cihub/seelog"
 	_ "github.com/go-sql-driver/mysql"
-	"log"
 )
 
 var db *sql.DB
@@ -14,7 +14,7 @@ func init() {
 	db.SetMaxIdleConns(1000)
 	db.SetMaxOpenConns(2000)
 	if err := db.Ping(); err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 }
 
@@ -35,13 +35,13 @@ func uploadProfile(username string, profile string) error {
 
 	res, err := stmt.Exec(profile, username)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return err
 	}
 
 	num, err := res.RowsAffected()
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return err
 	}
 
@@ -60,13 +60,13 @@ func changeNickname(username string, nickname string) error {
 
 	res, err := stmt.Exec(nickname, username)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return err
 	}
 
 	num, err := res.RowsAffected()
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return err
 	}
 

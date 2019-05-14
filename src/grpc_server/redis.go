@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	log "github.com/cihub/seelog"
 	"github.com/go-redis/redis"
-	"log"
 	"time"
 )
 
@@ -19,20 +19,20 @@ func init() {
 
 	_, err := client.Ping().Result()
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 }
 
 func cacheUserInfo(ui *userInfo) {
 	value, err := json.Marshal(ui)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 
 	_, err = client.SetNX(ui.username, value, 360*time.Second).Result()
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 	}
 
 }
@@ -42,14 +42,14 @@ func fetchUserInfo(username string) (*userInfo, error) {
 	if err == redis.Nil {
 		return nil, err
 	} else if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return nil, err
 	}
 
 	var ui userInfo
 	err = json.Unmarshal([]byte(value), &ui)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return nil, err
 	}
 	return &ui, nil
@@ -58,6 +58,6 @@ func fetchUserInfo(username string) (*userInfo, error) {
 func delUserInfo(username string) {
 	_, err := client.Del(username).Result()
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 	}
 }

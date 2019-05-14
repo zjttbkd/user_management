@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	pb "shopee/entrytask-kuangdi.bao/src/pb"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -56,7 +56,7 @@ func TestServer_UploadProfile(t *testing.T) {
 func TestServer_ChangeNickname(t *testing.T) {
 	s := server{}
 
-	in := &pb.NicknameRequest{Username: "test", Nickname: "test_change_" + strconv.Itoa(rand.Int())}
+	in := &pb.NicknameRequest{Username: "test", Nickname: fmt.Sprintf("test_change_%v", rand.Int())}
 	out, err := s.ChangeNickname(context.Background(), in)
 	if err != nil {
 		t.Error(err)

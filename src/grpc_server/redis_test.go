@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -11,7 +11,8 @@ var ui *userInfo
 
 func init() {
 	rand.Seed(time.Now().Unix())
-	ui = &userInfo{"test_" + strconv.Itoa(rand.Int()), "", "test_for_reids", "no profile"}
+	username := fmt.Sprintf("test_%v", rand.Int())
+	ui = &userInfo{username, "", "test_for_reids", "no profile"}
 }
 
 func TestCacheUserInfo(t *testing.T) {
