@@ -11,7 +11,7 @@
     ├── grpc_server # tcp服务器
     ├── http_server # http服务器
     ├── pb # pb文件
-    ├── start.sh # 启动脚步本
+    ├── start.sh # 启动脚步
     └── vendor # vendor目录
     
 ```
@@ -19,6 +19,8 @@
 ## 接口设计
 
 ### http服务
+
+#### http接口
 
 接口名| 绑定路径 | 请求参数 | 返回结果
 ------|-----|------------|-------
