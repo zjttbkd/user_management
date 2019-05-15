@@ -33,6 +33,7 @@ daemon_is_running(){
 buildServer(){
    serverName=$1
    buildDir=$2
+   [ -d "${binDir}" ] || mkdir -p "${binDir}"
    [ -x ${binDir}${serverName} ] && rm -rf ${binDir}/${serverName}
    cd "${buildDir}" && go build -o ${binDir}/${serverName}
    echo "Compile ${serverName} successfully."
