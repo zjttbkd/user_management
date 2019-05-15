@@ -21,6 +21,7 @@ func (s *server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.UsrInfoRep
 		return &pb.UsrInfoReply{}, errors.New("user not existed")
 	}
 
+	// TODO encryption
 	if ui.password != in.Password {
 		return &pb.UsrInfoReply{}, errors.New("wrong password")
 	}

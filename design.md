@@ -10,15 +10,25 @@
 └── src # src目录
     ├── grpc_server # tcp服务器
     ├── http_server # http服务器
-    ├── pb # pb协议
+    ├── pb # pb文件
+    ├── start.sh # 启动脚步本
     └── vendor # vendor目录
+    
 ```
 
 ## 接口设计
 
 ### http服务
 
-TODO
+接口名| 绑定路径 | 请求参数 | 返回结果
+------|-----|------------|-------
+个人主页| GET "/"; GET "/index"|cookie: {"gin_cookie": username}|usrinfo.html
+登录页|GET "/login"|-|login.html
+登录动作|POST "/login"|表单{"username": username, "password": password}|usrinfo.html
+上传图片|POST "/upload"|表单{"profile": profile}; cookie: {"gin_cookie": username}|result.html
+修改昵称|POST "/change"|表单{"nickname": nickname}; cookie: {"gin_cookie": username}|result.html
+获取用户信息|POST "/usrinfo/:username"|JSON{"token": "test_token"}|JSON{"username": username, "profile": profile, "nickname": nickname}
+
 
 ### grpc服务
 
