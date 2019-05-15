@@ -11,7 +11,7 @@
     ├── grpc_server # tcp服务器
     ├── http_server # http服务器
     ├── pb # pb文件
-    ├── start.sh # 启动脚步
+    ├── start.sh # 启动脚本
     └── vendor # vendor目录
     
 ```
