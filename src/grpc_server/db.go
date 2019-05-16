@@ -5,6 +5,7 @@ import (
 	"errors"
 	log "github.com/cihub/seelog"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 var db *sql.DB
@@ -13,6 +14,7 @@ func init() {
 	db, _ = sql.Open("mysql", "root:passw0rd@tcp(172.18.0.22)/user_mgn_db?charset=utf8mb4")
 	db.SetMaxIdleConns(1000)
 	db.SetMaxOpenConns(2000)
+	db.SetConnMaxLifetime(time.Second * 60)
 	if err := db.Ping(); err != nil {
 		panic(err)
 	}
@@ -34,6 +36,7 @@ func uploadProfile(username string, profile string) error {
 	}
 
 	res, err := stmt.Exec(profile, username)
+	stmt.Close()
 	if err != nil {
 		log.Error(err)
 		return err
@@ -59,6 +62,7 @@ func changeNickname(username string, nickname string) error {
 	}
 
 	res, err := stmt.Exec(nickname, username)
+	stmt.Close()
 	if err != nil {
 		log.Error(err)
 		return err
